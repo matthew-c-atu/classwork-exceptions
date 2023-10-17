@@ -2,6 +2,7 @@ package bankaccount;
 import bankaccount.exceptions.InvalidAccountNumberException;
 
 import java.util.NoSuchElementException;
+import java.util.Scanner;
 
 public class MainApp {
 
@@ -35,6 +36,12 @@ public class MainApp {
                             } while (option.equals("continue"));
 
                            break;
+                        case "g":
+                        case "get":
+                            do {
+                                option = ba.findAccount();
+                            } while (option.equals("continue"));
+                            break;
                         case "ls":
                         case "list":
                             option = ba.listAccounts();

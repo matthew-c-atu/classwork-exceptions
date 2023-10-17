@@ -5,15 +5,12 @@ import bankaccount.exceptions.InsufficientFundsException;
 import bankaccount.exceptions.InvalidAccountNumberException;
 
 import java.io.*;
-import java.nio.file.InvalidPathException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class BankAccountApp {
-    private String regexAccountNumber= "[0-9]+";
-    private String regexBalance= "";
     private ArrayList<BankAccount> accounts;
     BankAccountApp() {
         this.accounts = new ArrayList<BankAccount>();
@@ -78,7 +75,9 @@ public class BankAccountApp {
 
     String help() {
         System.out.println("\nOptions: " +
+                "\nUse the following from the main menu:" +
                 "\na , add - Add a bank account" +
+                "\ng, get - Get the details of a specific bank account." +
                 "\nls , list - List all bank accounts." +
 //                "\n[n] - list details of bank account n"
 
@@ -97,7 +96,7 @@ public class BankAccountApp {
         String option = "_";
 
         Scanner sc = new Scanner(System.in);
-        System.out.println("Please enter an option: ");
+        System.out.println("---Main Menu---\nPlease enter an option: ");
         option = sc.next();
 
         return option.toLowerCase();
@@ -164,6 +163,9 @@ public class BankAccountApp {
                case "b":
                case "back":
                    return "back";
+               case "g":
+               case "get":
+                   return "get";
                case "h":
                case "help":
                    return "help";
@@ -191,17 +193,62 @@ public class BankAccountApp {
             for (BankAccount ba : this.accounts)
                 System.out.println(ba);
         }
+        else {
+            System.out.println("No accounts exist yet");
+        }
         return "back";
     }
-    public void listAccounts(int accountNumber) {
+    public String findAccount() throws InvalidAccountNumberException {
+
         if (!this.accounts.isEmpty()) {
+            int id = 0;
+            System.out.println("Enter an account number to get its details: ");
+            Scanner sc = new Scanner(System.in);
+            try {
+                id = sc.nextInt();
+            }
+            catch (InputMismatchException e) {
+                String input = sc.next();
+                return handleUnexpectedInput(input);
+            }
+            if (id < 1)
+                throw new InvalidAccountNumberException("Account number must be greater than 0");
             Comparator<BankAccount> idComp = new CompareBankAccount();
             this.accounts.sort(idComp);
             // Perform binary search
-//            this.accounts.
-
-
+            try {
+                System.out.println(this.accounts.get(binarySearch(this.accounts, id)));
+            }
+            catch (Exception e) {
+                System.err.println("Bank account " + id + " doesn't exist");
+            }
         }
+        else {
+            System.out.println("No accounts exist yet");
+        }
+        return "continue";
+    }
+
+    private int binarySearch(ArrayList<BankAccount> list, int id) {
+       int low = 0;
+       int high = list.size();
+       int mid;
+       BankAccount guess;
+
+       while (low <= high) {
+            mid = (low + high) / 2;
+            guess = list.get(mid);
+
+            if (guess.getAccountNumber() == id)
+                return mid;
+
+            if (guess.getAccountNumber() > id)
+                high = mid -1;
+            else
+                low = mid + 1;
+       }
+
+       return 0;
     }
 
 
